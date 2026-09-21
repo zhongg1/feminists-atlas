@@ -1,5 +1,5 @@
 <title>女权主义者图谱</title>
-<!-- 字体：使用系统自带中文字体，无外部请求（国内可正常显示哦） -->
+<!-- 字体：使用系统自带中文字体，无外部请求（国内可正常显示） -->
 <style>
   :root{
     --serif:'Noto Serif SC','Songti SC','STSong',serif;
@@ -269,6 +269,11 @@
   :root[data-theme="dark"] .wiki{color:#1a1421}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wiki{color:#1a1421}}
   .wiki:hover{opacity:.88}
+  .p-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .wiki.wiki-alt{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  :root[data-theme="dark"] .wiki.wiki-alt{color:var(--accent)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wiki.wiki-alt{color:var(--accent)}}
+  .wiki.wiki-alt:hover{background:var(--accent-soft)}
   .panel-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}
 
   /* ---------- Footer ---------- */
@@ -480,6 +485,7 @@ const PEOPLE = D.map((r,i)=>({id:i,name:r[0],en:r[1],region:r[2],cat:r[3],lat:r[
   year:r[6],tags:r[7],desc:r[8],wiki:r[9]}));
 
 const wikiURL = n => 'https://zh.wikipedia.org/w/index.php?title=Special:Search&search='+encodeURIComponent(n)+'&go=Go';
+const baikeURL = n => 'https://baike.baidu.com/search?word='+encodeURIComponent(n);
 
 /* ---------- stats ---------- */
 (function(){
@@ -516,8 +522,11 @@ function openDetail(p){
     <div class="panel-body">
       <p class="p-desc">${p.desc}</p>
       <div class="p-tags">${p.tags.map(t=>`<span class="p-tag"># ${t}</span>`).join('')}</div>
-      <a class="wiki" href="${p.wiki||wikiURL(p.name)}" target="_blank" rel="noopener noreferrer">维基百科 · 了解更多 →</a>
-      <p class="panel-note">链接指向中文维基百科对应条目的搜索跳转；若某位人物暂无中文条目，可尝试英文名 <em>${p.en}</em> 检索。</p>
+      <div class="p-links">
+        <a class="wiki" href="${baikeURL(p.name)}" target="_blank" rel="noopener noreferrer">百度百科 →</a>
+        <a class="wiki wiki-alt" href="${p.wiki||wikiURL(p.name)}" target="_blank" rel="noopener noreferrer">维基百科 →</a>
+      </div>
+      <p class="panel-note">国内访客建议用百度百科；维基百科在海外或科学上网环境可访问。若某位暂无对应词条，可用英文名 <em>${p.en}</em> 检索。</p>
     </div>`;
   scrim.classList.add('open');
   document.getElementById('pclose').addEventListener('click',closeDetail);
