@@ -209,6 +209,31 @@
     -webkit-box-orient:vertical;overflow:hidden}
   .empty{color:var(--muted);padding:40px 0;text-align:center}
 
+  /* ---------- Schools ---------- */
+  .schoolgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .school{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:14px;padding:18px 18px 20px;display:flex;flex-direction:column;gap:9px;scroll-margin-top:84px}
+  .school .s-num{font-family:var(--latin);font-size:11.5px;font-weight:600;color:var(--gold);letter-spacing:.06em}
+  .school .s-name{font-family:var(--serif);font-weight:700;font-size:19px;line-height:1.25;margin:0}
+  .school .s-core{font-size:13.5px;color:var(--muted);line-height:1.72;margin:0}
+  .school .s-reps{display:flex;flex-wrap:wrap;gap:7px;margin-top:3px}
+  .school .s-reps-label{font-size:11px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;
+    font-family:var(--latin);width:100%;margin-bottom:0}
+  .rep{font-size:13px;padding:4px 11px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line);
+    color:var(--muted)}
+  .rep.linked{color:var(--accent);border-color:var(--accent);cursor:pointer;background:transparent;font-weight:600;
+    appearance:none;font-family:var(--sans);text-decoration:underline;text-underline-offset:3px}
+  .rep.linked:hover{background:var(--accent-soft)}
+  .school.flash{animation:flash 1.6s ease}
+  @keyframes flash{0%,100%{box-shadow:none}22%{box-shadow:0 0 0 3px var(--accent-soft),var(--shadow)}}
+  @media (prefers-reduced-motion:reduce){.school.flash{animation:none}}
+  .p-schools{margin:2px 0 6px}
+  .p-schools .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+    font-family:var(--latin);display:block;margin-bottom:9px}
+  .school-chip{appearance:none;font-family:var(--sans);cursor:pointer;font-size:12.5px;color:var(--gold);
+    background:transparent;border:1px solid var(--gold);padding:4px 11px;border-radius:8px;margin:0 6px 6px 0}
+  .school-chip:hover{background:var(--surface-2)}
+
   /* ---------- Submit form ---------- */
   .formcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
     padding:26px 26px 30px;max-width:640px}
@@ -303,8 +328,9 @@
     <button class="tab" role="tab" data-view="map" aria-selected="true"><span class="k">01</span>时空地图</button>
     <button class="tab" role="tab" data-view="river" aria-selected="false"><span class="k">02</span>时间长河</button>
     <button class="tab" role="tab" data-view="graph" aria-selected="false"><span class="k">03</span>知识网络</button>
-    <button class="tab" role="tab" data-view="cards" aria-selected="false"><span class="k">04</span>人物图鉴</button>
-    <button class="tab" role="tab" data-view="submit" aria-selected="false"><span class="k">05</span>补充遗漏</button>
+    <button class="tab" role="tab" data-view="schools" aria-selected="false"><span class="k">04</span>女权流派</button>
+    <button class="tab" role="tab" data-view="cards" aria-selected="false"><span class="k">05</span>人物图鉴</button>
+    <button class="tab" role="tab" data-view="submit" aria-selected="false"><span class="k">06</span>补充遗漏</button>
   </div></div>
 </nav>
 
@@ -319,7 +345,7 @@
         <button class="playbtn" id="play">▶ 播放历程</button>
         <div class="yearbig" id="yearbig">2025</div>
         <div class="scrub"><input type="range" id="scrub" min="1785" max="2025" value="2025" step="1" aria-label="时间刻度"></div>
-        <div class="timehint" id="timehint">当前显示：全部 47 位（截至 2025 年）</div>
+        <div class="timehint" id="timehint">当前显示：全部人物（截至 2025 年）</div>
       </div>
     </div>
   </section>
@@ -336,6 +362,12 @@
     <p class="view-intro">人物按<b>思潮主题</b>（金色节点：选举权、黑人女权、交叉性、诺贝尔和平奖、作家……）连成网络。<b>拖动</b>可整理布局，<b>滚轮缩放</b>，悬停高亮关联，点击人物看详情。</p>
     <div class="legend" id="legend-graph"></div>
     <div class="graphcard"><svg class="graph" id="graph"></svg><div class="ghint">拖动 · 缩放 · 悬停高亮</div></div>
+  </section>
+
+  <!-- SCHOOLS -->
+  <section id="view-schools" class="view" hidden>
+    <p class="view-intro">女权主义并非单一主张，而是众多<b>流派</b>的交织与争鸣——划分标准不一、彼此交叉，且新流派仍在不断出现。以下是学术界与运动中较有影响的 17 个流派及其核心观点。<b>带下划线的代表人物</b>已收录在本站，可点击查看详情。</p>
+    <div class="schoolgrid" id="schoolgrid"></div>
   </section>
 
   <!-- CARDS -->
@@ -369,7 +401,7 @@
         </div>
         <div class="field">
           <label for="f-desc">一句话简介 <i>*</i></label>
-          <textarea id="f-desc" name="简介" required rows="3" placeholder="她 / 他的主要贡献、代表作或身份"></textarea>
+          <textarea id="f-desc" name="简介" required rows="3" placeholder="她的主要贡献、代表作或身份"></textarea>
         </div>
         <div class="field">
           <label for="f-link">参考链接（选填）</label>
@@ -377,7 +409,11 @@
         </div>
         <div class="field">
           <label for="f-reason">推荐理由（选填）</label>
-          <textarea id="f-reason" name="推荐理由" rows="2" placeholder="为什么她 / 他应该被收录？"></textarea>
+          <textarea id="f-reason" name="推荐理由" rows="2" placeholder="为什么她应该被收录？"></textarea>
+        </div>
+        <div class="field">
+          <label for="f-feedback">对网站的改进建议（选填）</label>
+          <textarea id="f-feedback" name="改进建议" rows="2" placeholder="使用体验、想要的功能、发现的错误……都欢迎"></textarea>
         </div>
         <div class="field">
           <label for="f-email">你的邮箱（选填，便于回复）</label>
@@ -394,8 +430,8 @@
 <footer>
   <div class="wrap">
     <p class="q">"这份名单只是冰山一角。女权主义从来不是单一声音，而是由不同种族、阶级、性取向、地域的女性共同书写的思想与行动史。"</p>
-    <p>收录 47 位人物 · 6 大板块 · 遍及四大洲。人物简介取自原始名单，"维基百科"链接指向中文维基百科的对应条目搜索。</p>
-    <p class="src">资料来源：《女权主义者名单概略》· 交互设计由此名单生成，欢迎补充与修订。</p>
+    <p>收录 68 位人物 · 17 女权流派 · 6 大板块 · 遍及四大洲。人物简介取自原始资料，"维基百科"链接指向中文维基百科的对应条目搜索。</p>
+    <p class="src">资料来源：《女权主义者名单概略》《女权主义流派》· 交互设计由以上资料生成，欢迎补充与修订。</p>
   </div>
 </footer>
 
@@ -478,20 +514,73 @@ const D = [
   ['法蒂玛·梅尔尼西','Fatema Mernissi','摩洛哥',6,34.03,-5.0,1975,['学者','理论'],'摩洛哥，社会学家、女性主义学者。'],
   ['弗洛拉·特里斯坦','Flora Tristan','秘鲁 / 法国',6,-12.05,-77.04,1843,['理论','先驱'],'秘鲁 / 法国，早期社会主义女权先驱。'],
   ['多拉·巴兰科斯','Dora Barrancos','阿根廷',6,-34.6,-58.38,2010,['学者','性别研究'],'阿根廷，性别研究领军人物。'],
-  ['内丽·明耶斯基','Nelly Minyersky','阿根廷',6,-34.6,-58.38,2018,['行动者','生育权','法律'],'阿根廷，争取安全堕胎权利。']
+  ['内丽·明耶斯基','Nelly Minyersky','阿根廷',6,-34.6,-58.38,2018,['行动者','生育权','法律'],'阿根廷，争取安全堕胎权利。'],
+
+  // —— 由《女权主义流派》补充的代表人物 ——
+  ['恩格斯','Friedrich Engels','德国',1,51.27,7.18,1884,['马克思主义女权','理论','男性盟友'],'德国，《家庭、私有制和国家的起源》，从经济根源分析女性受压迫。'],
+  ['凯瑟琳·麦金侬','Catharine MacKinnon','美国',2,42.28,-83.74,1979,['激进女权','法律','理论'],'美国，法学家，开创性骚扰的法律概念，激进女权理论家。'],
+  ['莉丝·沃格尔','Lise Vogel','美国',2,40.71,-74.0,1983,['马克思主义女权','社会再生产','理论'],'美国，社会再生产理论代表，马克思主义女权主义学者。'],
+  ['朱丽叶·米切尔','Juliet Mitchell','英国',2,51.5,-0.12,1974,['社会主义女权','精神分析','理论'],'英国，《精神分析与女性主义》，社会主义与精神分析女权理论家。'],
+  ['海蒂·哈特曼','Heidi Hartmann','美国',2,38.9,-77.0,1979,['社会主义女权','经济','理论'],'美国，经济学家，提出资本主义与父权制的"双重压迫"。'],
+  ['卡罗尔·吉利根','Carol Gilligan','美国',2,40.71,-74.0,1982,['文化女权','关怀伦理','心理学'],'美国，《不同的声音》，关怀伦理与文化女权主义。'],
+  ['玛丽·戴利','Mary Daly','美国',2,42.36,-71.06,1978,['文化女权','激进女权','神学'],'美国，激进女性主义神学家，重估女性中心的文化与伦理。'],
+  ['弗朗索瓦·德奥博纳','Françoise d’Eaubonne','法国',2,48.85,2.35,1974,['生态女权','理论'],'法国，1974 年首创"生态女权主义"一词。'],
+  ['纨妲娜·希瓦','Vandana Shiva','印度',5,30.32,78.03,1988,['生态女权','环境','行动者'],'印度，生态女权主义者、环境行动家，《活着》。'],
+  ['卡伦·沃伦','Karen J. Warren','美国',3,44.94,-93.09,1990,['生态女权','哲学'],'美国，生态女权主义哲学家，系统阐述生态女权理论。'],
+  ['吕斯·伊里加雷','Luce Irigaray','法国',2,48.85,2.35,1974,['精神分析','后结构','理论'],'法国，《他者女人的窥镜》，精神分析与后结构女权理论家。','https://zh.wikipedia.org/wiki/%E8%B7%AF%E6%80%9D%C2%B7%E4%BC%8A%E7%91%9E%E8%91%9B%E4%BE%86'],
+  ['茱莉亚·克里斯蒂娃','Julia Kristeva','法国',2,48.85,2.35,1980,['精神分析','后结构','理论'],'法国，符号学与精神分析理论家，深刻影响女性主义与文学理论。'],
+  ['埃莱娜·西苏','Hélène Cixous','法国',2,48.85,2.35,1975,['后现代','后结构','作家'],'法国，"阴性书写"倡导者，《美杜莎的笑声》。'],
+  ['钱德拉·莫汉蒂','Chandra Talpade Mohanty','印度 / 美国',5,19.07,72.87,1984,['后殖民女权','跨国女权','理论'],'印度 / 美国，后殖民女权主义者，《在西方注视下》。'],
+  ['贾亚特里·查克拉沃蒂·斯皮瓦克','Gayatri Chakravorty Spivak','印度',5,22.57,88.36,1988,['后殖民女权','理论'],'印度，后殖民理论家，《属下能说话吗？》。'],
+  ['艾德丽安·里奇','Adrienne Rich','美国',2,39.29,-76.61,1980,['女同性恋女权','作家','理论'],'美国，诗人与理论家，提出"强制异性恋"概念。'],
+  ['玛丽莲·弗莱','Marilyn Frye','美国',2,42.73,-84.55,1983,['女同性恋女权','哲学'],'美国，女权主义哲学家，剖析压迫与父权结构。'],
+  ['埃玛·戈尔德曼','Emma Goldman','美国',1,40.71,-74.0,1910,['无政府女权','行动者','理论'],'美国，无政府主义女权先驱，倡导自由与直接行动。'],
+  ['唐娜·哈拉维','Donna Haraway','美国',2,36.97,-122.03,1985,['赛博女权','科技','理论'],'美国，《赛博格宣言》，赛博女权主义奠基者。'],
+  ['阿米娜·瓦杜德','Amina Wadud','美国',3,37.54,-77.43,1992,['伊斯兰女权','神学','理论'],'美国，伊斯兰女权主义学者，《古兰经与女性》。'],
+  ['莱拉·艾哈迈德','Leila Ahmed','埃及',6,30.04,31.24,1992,['伊斯兰女权','历史','理论'],'埃及，伊斯兰女权主义历史学家，《伊斯兰中的女性与性别》。']
 ];
 
 const PEOPLE = D.map((r,i)=>({id:i,name:r[0],en:r[1],region:r[2],cat:r[3],lat:r[4],lng:r[5],
   year:r[6],tags:r[7],desc:r[8],wiki:r[9]}));
 
 const wikiURL = n => 'https://zh.wikipedia.org/w/index.php?title=Special:Search&search='+encodeURIComponent(n)+'&go=Go';
-const baikeURL = n => 'https://baike.baidu.com/search?word='+encodeURIComponent(n);
+
+/* ---------- 女权流派 ---------- */
+const ALIAS={'约翰·穆勒':'约翰·斯图尔特·密尔','凯特·米利特':'凯特·米列','金伯利·克伦肖':'金柏莉·威廉斯·坎秀'};
+const nameIndex={}; PEOPLE.forEach(p=>nameIndex[p.name]=p);
+const findPerson=n=>nameIndex[ALIAS[n]||n]||null;
+const SCHOOLS=[
+ {name:'自由主义女权主义',core:'主张在现有政治、法律和经济制度内，通过改革实现两性平等。关注选举权、教育权、就业权、同工同酬、反歧视等法律权利。',reps:['玛丽·沃斯通克拉夫特','约翰·穆勒','贝蒂·弗里丹']},
+ {name:'激进女权主义',core:'认为父权制是最根本、最普遍的压迫制度，男性对女性身体、性、生育的控制是压迫核心。主张彻底推翻父权制，关注性暴力、色情、生育技术等问题。',reps:['凯特·米利特','舒拉米斯·费尔斯通','凯瑟琳·麦金侬','玛丽·戴利']},
+ {name:'马克思主义女权主义',core:'女性受压迫根源于私有制和阶级社会；家务劳动和生育等再生产劳动无偿且被忽视。妇女解放与消灭阶级、变革生产关系紧密相连。',reps:['恩格斯','莉丝·沃格尔']},
+ {name:'社会主义女权主义',core:'资本主义与父权制相互强化，形成“双重压迫”。主张同时改变经济结构与性别文化，关注有偿劳动与无偿劳动、福利国家、再生产劳动等问题。',reps:['朱丽叶·米切尔','海蒂·哈特曼']},
+ {name:'文化女权主义',core:'强调女性特有的关怀、关系、和平、合作等价值被父权文化贬低，主张重估“女性气质”，建立女性中心的文化和伦理。',reps:['卡罗尔·吉利根','玛丽·戴利']},
+ {name:'生态女权主义',core:'认为对女性与对自然的支配共享同一套二元等级逻辑（男性/女性、文化/自然、理性/情感），主张生态正义与性别正义结合，反对一切支配结构。',reps:['弗朗索瓦·德奥博纳','纨妲娜·希瓦','卡伦·沃伦']},
+ {name:'精神分析女权主义',core:'运用弗洛伊德、拉康等精神分析理论，分析性别认同如何形成，批判“阳具中心主义”和俄狄浦斯结构，探讨语言、无意识、欲望中的性别权力。',reps:['朱丽叶·米切尔','吕斯·伊里加雷','茱莉亚·克里斯蒂娃']},
+ {name:'存在主义女权主义',core:'波伏娃提出“女人不是天生的，而是后天形成的”。女性被建构为“他者”，解放需要超越内在性，通过行动、事业和经济独立确立主体。',reps:['西蒙娜·德·波伏娃']},
+ {name:'后现代 / 后结构女权主义',core:'解构“女性”“性别”等普遍范畴，认为性别是话语和操演的结果，反对二元对立和宏大叙事，强调差异、局部和多元。',reps:['朱迪斯·巴特勒','埃莱娜·西苏']},
+ {name:'黑人女权主义 / 有色人种女权主义',core:'批判主流女权主义以白人、中产女性经验为中心，强调种族、阶级与性别交织的“支配矩阵”，关注黑人女性和有色人种女性的独特处境。',reps:['贝尔·胡克斯','帕特里夏·希尔·柯林斯']},
+ {name:'交叉性女权主义',core:'由金伯利·克伦肖提出，分析性别、种族、阶级、性向、残障等多种社会身份如何交叉叠加，造成不同的压迫体验，避免单一性别分析。',reps:['金伯利·克伦肖']},
+ {name:'跨国 / 后殖民女权主义',core:'批判西方女权主义的普世化和“拯救第三世界女性”话语，关注殖民主义、帝国主义、全球化中的性别权力关系，强调地方知识与女性主体性。',reps:['钱德拉·莫汉蒂','贾亚特里·查克拉沃蒂·斯皮瓦克']},
+ {name:'女同性恋女权主义 / 分离主义',core:'认为强制异性恋是父权制的核心制度，异性恋关系再生产男性支配；主张女同性恋作为政治选择，建立女性空间和女性中心社群。',reps:['艾德丽安·里奇','玛丽莲·弗莱']},
+ {name:'无政府女权主义',core:'反对一切等级支配——国家、资本、父权、宗教，主张去中心化、自治、互助和直接行动来实现性别解放。',reps:['埃玛·戈尔德曼']},
+ {name:'赛博女权主义',core:'探讨信息技术、数字身体、人工智能等如何挑战性别二元与身体边界，赛博格形象被视为超越固定性别范畴的可能。',reps:['唐娜·哈拉维']},
+ {name:'伊斯兰女权主义',core:'在伊斯兰传统内部通过重新解释《古兰经》和圣训争取性别平等，反对以西方世俗化为唯一路径，也反对父权式宗教解读。',reps:['阿米娜·瓦杜德','莱拉·艾哈迈德']},
+ {name:'其他相关流派',core:'还有一些边界模糊或争议较大的流派，例如：个人主义女权主义（强调个人权利、自由市场，反对国家干预）；关怀伦理女权主义（以“关怀”为核心重构道德与政治）；性别批判女权主义（关注生理性别与女性权利，对性别认同政治持批判态度）。',reps:[]}
+];
+PEOPLE.forEach(p=>p.schoolIdx=[]);
+SCHOOLS.forEach((s,idx)=>s.reps.forEach(r=>{const p=findPerson(r);if(p&&p.schoolIdx.indexOf(idx)<0)p.schoolIdx.push(idx);}));
+function highlightSchool(idx){
+  const el=document.getElementById('school-'+idx); if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
 
 /* ---------- stats ---------- */
 (function(){
   const regions = new Set(PEOPLE.map(p=>p.region.split(' / ')[0]));
   const yrs = PEOPLE.map(p=>p.year);
-  const S=[[PEOPLE.length,'位人物'],[6,'大板块'],[regions.size,'个国家 / 地区'],[Math.min(...yrs)+'–'+Math.max(...yrs),'跨越年代']];
+  const S=[[PEOPLE.length,'位人物'],[6,'大板块'],[SCHOOLS.length,'女权流派'],[regions.size,'个国家 / 地区'],[Math.min(...yrs)+'–'+Math.max(...yrs),'跨越年代']];
   document.getElementById('stats').innerHTML = S.map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
 })();
 
@@ -522,11 +611,9 @@ function openDetail(p){
     <div class="panel-body">
       <p class="p-desc">${p.desc}</p>
       <div class="p-tags">${p.tags.map(t=>`<span class="p-tag"># ${t}</span>`).join('')}</div>
-      <div class="p-links">
-        <a class="wiki" href="${baikeURL(p.name)}" target="_blank" rel="noopener noreferrer">百度百科 →</a>
-        <a class="wiki wiki-alt" href="${p.wiki||wikiURL(p.name)}" target="_blank" rel="noopener noreferrer">维基百科 →</a>
-      </div>
-      <p class="panel-note">国内访客建议用百度百科；维基百科在海外或科学上网环境可访问。若某位暂无对应词条，可用英文名 <em>${p.en}</em> 检索。</p>
+      ${p.schoolIdx&&p.schoolIdx.length?`<div class="p-schools"><span class="lbl">所属流派 Schools</span>${p.schoolIdx.map(i=>`<button class="school-chip" data-school="${i}">${SCHOOLS[i].name}</button>`).join('')}</div>`:''}
+      <a class="wiki" href="${p.wiki||wikiURL(p.name)}" target="_blank" rel="noopener noreferrer">维基百科 · 了解更多 →</a>
+      <p class="panel-note">链接指向中文维基百科对应条目；若某位暂无对应词条，可用英文名 <em>${p.en}</em> 检索。</p>
     </div>`;
   scrim.classList.add('open');
   document.getElementById('pclose').addEventListener('click',closeDetail);
@@ -535,6 +622,8 @@ function openDetail(p){
 function closeDetail(){panel.classList.remove('open');scrim.classList.remove('open');
   if(lastFocus&&lastFocus.focus)lastFocus.focus();}
 scrim.addEventListener('click',closeDetail);
+panel.addEventListener('click',e=>{const s=e.target.closest('[data-school]');
+  if(s){const i=+s.dataset.school;closeDetail();show('schools');requestAnimationFrame(()=>highlightSchool(i));}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))closeDetail();});
 
 /* ---------- tooltip ---------- */
@@ -668,6 +757,22 @@ function layoutRiver(){
   box.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('tl')){e.preventDefault();openDetail(PEOPLE[+e.target.dataset.id]);}});
 })();
 if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>layoutRiver());}
+
+/* ---------- SCHOOLS render ---------- */
+(function(){
+  const box=document.getElementById('schoolgrid'); if(!box)return;
+  box.innerHTML=SCHOOLS.map((s,idx)=>`
+    <div class="school" id="school-${idx}">
+      <div class="s-num">流派 ${idx+1} / ${SCHOOLS.length}</div>
+      <h3 class="s-name">${s.name}</h3>
+      <p class="s-core">${s.core}</p>
+      ${s.reps.length?`<div class="s-reps"><span class="s-reps-label">代表人物</span>${
+        s.reps.map(r=>{const p=findPerson(r);return p
+          ?`<button class="rep linked" data-goperson="${p.id}">${p.name}</button>`
+          :`<span class="rep">${r}</span>`;}).join('')}</div>`:''}
+    </div>`).join('');
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-goperson]');if(b)openDetail(PEOPLE[+b.dataset.goperson]);});
+})();
 
 /* ---------- GRAPH ---------- */
 let graphDone=false;
