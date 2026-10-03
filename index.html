@@ -63,7 +63,14 @@
   .cat4{--c:var(--c4)} .cat5{--c:var(--c5)} .cat6{--c:var(--c6)}
 
   /* ---------- Masthead ---------- */
-  header.mast{padding-block:40px 20px;border-bottom:1px solid var(--line)}
+  header.mast{padding-block:40px 20px;border-bottom:1px solid var(--line);position:relative}
+  .langbtn{position:absolute;top:14px;right:20px;appearance:none;cursor:pointer;font-family:var(--latin);
+    font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--accent);background:var(--surface);
+    border:1px solid var(--accent);border-radius:999px;padding:7px 15px;transition:all .15s;z-index:5}
+  .langbtn:hover{background:var(--accent);color:#fff}
+  :root[data-theme="dark"] .langbtn:hover{color:#1a1421}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .langbtn:hover{color:#1a1421}}
+  .langbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .eyebrow{font-family:var(--latin);letter-spacing:.28em;text-transform:uppercase;
     font-size:12px;color:var(--gold);font-weight:600;margin:0 0 14px}
   h1.title{font-family:var(--serif);font-weight:700;font-size:clamp(34px,6vw,60px);
@@ -72,6 +79,12 @@
     display:block;font-size:clamp(15px,2.6vw,22px);letter-spacing:.02em;margin-top:10px}
   .lede{max-width:60ch;color:var(--muted);font-size:clamp(15px,1.7vw,17px);margin:20px 0 0}
   .stats{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:22px;align-items:baseline}
+  .visitbadge{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:6px 14px;
+    border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px;color:var(--muted)}
+  .visitbadge i{width:8px;height:8px;border-radius:50%;background:var(--c2);flex:0 0 auto;animation:vpulse 2.2s infinite}
+  .visitbadge b{font-family:var(--latin);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+  @keyframes vpulse{0%{box-shadow:0 0 0 0 rgba(46,125,111,.5)}70%{box-shadow:0 0 0 6px rgba(46,125,111,0)}100%{box-shadow:0 0 0 0 rgba(46,125,111,0)}}
+  @media (prefers-reduced-motion:reduce){.visitbadge i{animation:none}}
   .stat{display:flex;align-items:baseline;gap:8px}
   .stat b{font-family:var(--latin);font-weight:600;font-size:26px;color:var(--accent);
     font-variant-numeric:tabular-nums}
@@ -316,10 +329,12 @@
 
 <header class="mast">
   <div class="wrap">
+    <button id="langtoggle" class="langbtn" type="button" aria-label="Switch language / 切换语言">EN</button>
     <p class="eyebrow">A Global Atlas of Feminists · 1790s—2020s</p>
-    <h1 class="title">女权主义者图谱<span class="en">她们，跨越时代与大陆书写的思想与行动</span></h1>
-    <p class="lede">从历史到现代，女权主义者是一个庞大、多元且跨越全球的群体。这里按<b>地区</b>与<b>时期</b>收录了具代表性的人物——远非全部——你可以沿时间之河漫游、在世界地图上追踪、或顺着思潮的网络探索。</p>
+    <h1 class="title"><span id="ttl">女权主义者图谱</span><span class="en" id="sub">她们，跨越时代与大陆书写的思想与行动</span></h1>
+    <p class="lede" id="lede">从历史到现代，女权主义者是一个庞大、多元且跨越全球的群体。这里按<b>地区</b>与<b>时期</b>收录了具代表性的人物——远非全部——你可以沿时间之河漫游、在世界地图上追踪、或顺着思潮的网络探索。</p>
     <div class="stats" id="stats"></div>
+    <div class="visitbadge" id="visitors" hidden></div>
   </div>
 </header>
 
@@ -337,7 +352,7 @@
 <main class="wrap">
   <!-- MAP -->
   <section id="view-map" class="view">
-    <p class="view-intro">拖动下方的<b>时间刻度</b>，或点击<b>播放历程</b>，看这些女权主义者如何在近两百年间、于世界各地相继登场。每个圆点是一个人，点击可看详情。</p>
+    <p class="view-intro" id="intro-map">拖动下方的<b>时间刻度</b>，或点击<b>播放历程</b>，看这些女权主义者如何在近两百年间、于世界各地相继登场。每个圆点是一个人，点击可看详情。</p>
     <div class="legend" id="legend-map"></div>
     <div class="mapcard">
       <div class="mapwrap"><svg class="map" id="map"></svg><div class="ghint" id="maphint">滚轮缩放 · 拖动平移 · 双击放大</div></div>
@@ -352,21 +367,21 @@
 
   <!-- RIVER -->
   <section id="view-river" class="view" hidden>
-    <p class="view-intro">全体人物按<b>代表年代</b>汇成一条时间之河，色带从早期一直流向当代。点击任意一位查看详情。</p>
+    <p class="view-intro" id="intro-river">全体人物按<b>代表年代</b>汇成一条时间之河，色带从早期一直流向当代。点击任意一位查看详情。</p>
     <div class="legend" id="legend-river"></div>
     <div class="river" id="river"></div>
   </section>
 
   <!-- GRAPH -->
   <section id="view-graph" class="view" hidden>
-    <p class="view-intro">人物按<b>思潮主题</b>（金色节点：选举权、黑人女权、交叉性、诺贝尔和平奖、作家……）连成网络。<b>拖动</b>可整理布局，<b>滚轮缩放</b>，悬停高亮关联，点击人物看详情。</p>
+    <p class="view-intro" id="intro-graph">人物按<b>思潮主题</b>（金色节点：选举权、黑人女权、交叉性、诺贝尔和平奖、作家……）连成网络。<b>拖动</b>可整理布局，<b>滚轮缩放</b>，悬停高亮关联，点击人物看详情。</p>
     <div class="legend" id="legend-graph"></div>
-    <div class="graphcard"><svg class="graph" id="graph"></svg><div class="ghint">拖动 · 缩放 · 悬停高亮</div></div>
+    <div class="graphcard"><svg class="graph" id="graph"></svg><div class="ghint" id="graphhint">拖动 · 缩放 · 悬停高亮</div></div>
   </section>
 
   <!-- SCHOOLS -->
   <section id="view-schools" class="view" hidden>
-    <p class="view-intro">女权主义并非单一主张，而是众多<b>流派</b>的交织与争鸣——划分标准不一、彼此交叉，且新流派仍在不断出现。以下是学术界与运动中较有影响的 17 个流派及其核心观点。<b>带下划线的代表人物</b>已收录在本站，可点击查看详情。</p>
+    <p class="view-intro" id="intro-schools">女权主义并非单一主张，而是众多<b>流派</b>的交织与争鸣——划分标准不一、彼此交叉，且新流派仍在不断出现。以下是学术界与运动中较有影响的 17 个流派及其核心观点。<b>带下划线的代表人物</b>已收录在本站，可点击查看详情。</p>
     <div class="schoolgrid" id="schoolgrid"></div>
   </section>
 
@@ -386,37 +401,37 @@
 
   <!-- SUBMIT -->
   <section id="view-submit" class="view" hidden>
-    <p class="view-intro">这份名单远非完整。若你知道一位<b>被遗漏的女权主义者</b>，欢迎在此推荐——提交后由管理员审核，核实后加入图谱。</p>
+    <p class="view-intro" id="intro-submit">这份名单远非完整。若你知道一位<b>被遗漏的女权主义者</b>，欢迎在此推荐——提交后由管理员审核，核实后加入图谱。</p>
     <div class="formcard">
       <form id="subForm" novalidate>
         <div class="field">
-          <label for="f-name">姓名 <i>*</i></label>
+          <label id="lbl-name" for="f-name">姓名 <i>*</i></label>
           <input id="f-name" name="姓名" required placeholder="如：某某 / Jane Doe">
         </div>
         <div class="frow">
-          <div class="field"><label for="f-region">地区 / 国家 <i>*</i></label>
+          <div class="field"><label id="lbl-region" for="f-region">地区 / 国家 <i>*</i></label>
             <input id="f-region" name="地区" required placeholder="如：法国 / 印度"></div>
-          <div class="field"><label for="f-era">时期 / 年代</label>
+          <div class="field"><label id="lbl-era" for="f-era">时期 / 年代</label>
             <input id="f-era" name="时期" placeholder="如：19世纪 / 1970s / 当代"></div>
         </div>
         <div class="field">
-          <label for="f-desc">一句话简介 <i>*</i></label>
+          <label id="lbl-desc" for="f-desc">一句话简介 <i>*</i></label>
           <textarea id="f-desc" name="简介" required rows="3" placeholder="她的主要贡献、代表作或身份"></textarea>
         </div>
         <div class="field">
-          <label for="f-link">参考链接（选填）</label>
+          <label id="lbl-link" for="f-link">参考链接（选填）</label>
           <input id="f-link" name="参考链接" type="url" placeholder="维基百科、文章或访谈链接">
         </div>
         <div class="field">
-          <label for="f-reason">推荐理由（选填）</label>
+          <label id="lbl-reason" for="f-reason">推荐理由（选填）</label>
           <textarea id="f-reason" name="推荐理由" rows="2" placeholder="为什么她应该被收录？"></textarea>
         </div>
         <div class="field">
-          <label for="f-feedback">对网站的改进建议（选填）</label>
+          <label id="lbl-feedback" for="f-feedback">对网站的改进建议（选填）</label>
           <textarea id="f-feedback" name="改进建议" rows="2" placeholder="使用体验、想要的功能、发现的错误……都欢迎"></textarea>
         </div>
         <div class="field">
-          <label for="f-email">你的邮箱（选填，便于回复）</label>
+          <label id="lbl-email" for="f-email">你的邮箱（选填，便于回复）</label>
           <input id="f-email" name="_replyto" type="email" placeholder="you@example.com">
         </div>
         <button type="submit" class="submitb" id="subBtn">提交推荐</button>
@@ -429,9 +444,9 @@
 
 <footer>
   <div class="wrap">
-    <p class="q">"这份名单只是冰山一角。女权主义从来不是单一声音，而是由不同种族、阶级、性取向、地域的女性共同书写的思想与行动史。"</p>
-    <p>收录 68 位人物 · 17 女权流派 · 6 大板块 · 遍及四大洲。人物简介取自原始资料，"维基百科"链接指向中文维基百科的对应条目搜索。</p>
-    <p class="src">资料来源：《女权主义者名单概略》《女权主义流派》· 交互设计由以上资料生成，欢迎补充与修订。</p>
+    <p class="q" id="foot-q">"这份名单只是冰山一角。女权主义从来不是单一声音，而是由不同种族、阶级、性取向、地域的女性共同书写的思想与行动史。"</p>
+    <p id="foot-line">收录 68 位人物 · 17 女权流派 · 6 大板块 · 遍及四大洲。人物简介取自原始资料，"维基百科"链接指向中文维基百科的对应条目搜索。</p>
+    <p class="src" id="foot-src">资料来源：《女权主义者名单概略》《女权主义流派》· 交互设计由以上资料生成，欢迎补充与修订。</p>
   </div>
 </footer>
 
@@ -460,6 +475,152 @@ const CATS = {
   5:{name:'亚洲其他地区',short:'亚洲其他',era:''},
   6:{name:'非洲、中东与拉丁美洲',short:'非洲 · 中东 · 拉美',era:''}
 };
+
+/* ================= i18n ================= */
+let LANG='zh';
+const CATS_EN={
+  1:{name:'Early & First Wave (West)',short:'First Wave',era:'18th–early 20th c.'},
+  2:{name:'Second Wave (West)',short:'Second Wave',era:'1960s–80s'},
+  3:{name:'Third Wave & Contemporary (West)',short:'Third Wave · Now',era:'1990s–present'},
+  4:{name:'China',short:'China',era:'20th c. onward'},
+  5:{name:'Other Regions of Asia',short:'Rest of Asia',era:''},
+  6:{name:'Africa, Middle East & Latin America',short:'Africa · MENA · LatAm',era:''}
+};
+const REGION_EN={'英国':'UK','美国':'USA','法国':'France','澳大利亚 / 英国':'Australia / UK','巴基斯坦':'Pakistan','中国':'China','日本':'Japan','印度':'India','肯尼亚':'Kenya','尼日利亚':'Nigeria','加纳':'Ghana','埃及':'Egypt','摩洛哥':'Morocco','秘鲁 / 法国':'Peru / France','阿根廷':'Argentina','德国':'Germany','印度 / 美国':'India / USA'};
+const TAG_EN={'理论':'Theory','先驱':'Pioneer','男性盟友':'Male ally','选举权':'Suffrage','废奴':'Abolition','行动者':'Activist','哲学':'Philosophy','作家':'Writer','记者':'Journalist','黑人女权':'Black feminism','交叉性':'Intersectionality','性别研究':'Gender studies','教育权':'Education rights','诺贝尔和平奖':'Nobel Peace Prize','革命家':'Revolutionary','艺术':'Art','法律':'Law','反家暴':'Anti-DV','学者':'Scholar','环境':'Environment','医生':'Physician','生育权':'Reproductive rights','马克思主义女权':'Marxist feminism','激进女权':'Radical feminism','社会再生产':'Social reproduction','社会主义女权':'Socialist feminism','精神分析':'Psychoanalysis','经济':'Economics','文化女权':'Cultural feminism','关怀伦理':'Ethics of care','心理学':'Psychology','神学':'Theology','生态女权':'Ecofeminism','后结构':'Post-structuralism','后现代':'Postmodernism','后殖民女权':'Postcolonial feminism','跨国女权':'Transnational feminism','女同性恋女权':'Lesbian feminism','无政府女权':'Anarcha-feminism','赛博女权':'Cyberfeminism','科技':'Technology','伊斯兰女权':'Islamic feminism','历史':'History'};
+const DESC_EN=[
+`UK — A Vindication of the Rights of Woman (1792); a founder of feminist thought.`,
+`UK — Philosopher; The Subjection of Women (1869); a male ally of feminism.`,
+`USA — A lead organiser of the 1848 Seneca Falls Convention.`,
+`USA — Leader of the women's suffrage movement.`,
+`USA — Abolitionist and women's-rights campaigner.`,
+`UK — Leader of the Women's Social and Political Union; militant for suffrage.`,
+`UK — Campaigned peacefully for women's suffrage.`,
+`France — The Second Sex; "one is not born, but rather becomes, a woman."`,
+`USA — The Feminine Mystique; a pioneer of the modern women's movement.`,
+`USA — Journalist and activist; co-founder of Ms. magazine.`,
+`Australia / UK — The Female Eunuch.`,
+`USA — Sexual Politics.`,
+`USA — The Dialectic of Sex.`,
+`USA — Black feminist scholar and activist.`,
+`USA — Black feminist poet and theorist.`,
+`USA — Feminist Theory: From Margin to Center.`,
+`USA — Coined the theory of "intersectionality."`,
+`USA — A leading thinker of Black feminist thought.`,
+`USA — Theory of gender performativity; reshaped gender studies.`,
+`USA — Coined the "third wave" in 1992.`,
+`USA — Founder of the #MeToo movement.`,
+`Pakistan — Campaigner for girls' education; Nobel Peace Prize laureate.`,
+`China — Late-Qing revolutionary and feminist pioneer.`,
+`China — Leader of the women's movement in the 1911 Revolution era.`,
+`China — Women's-movement leader and painter.`,
+`China — Early Communist Party leader of the women's movement.`,
+`China — Writer.`,
+`China — Writer.`,
+`China — Advanced the rights of women and children.`,
+`China — A leading figure of the Chinese women's movement.`,
+`China — Lawyer and advocate for women's rights.`,
+`China — Sociologist and figure in the women's movement.`,
+`China — Contemporary sexologist and gender-studies scholar.`,
+`China — Anti-domestic-violence activist; helped drive the Anti-Domestic-Violence Law.`,
+`China — Gender-studies scholar and activist.`,
+`Japan — A pioneer of feminism.`,
+`Japan — Sociologist and feminist theorist.`,
+`India — Pioneer of women's education.`,
+`India — Poet, politician and women's-rights campaigner.`,
+`Kenya — Founder of the Green Belt Movement; Nobel Peace Prize laureate.`,
+`Nigeria — Writer; We Should All Be Feminists.`,
+`Ghana — Writer and feminist advocate.`,
+`Egypt — Writer, physician and feminist.`,
+`Morocco — Sociologist and feminist scholar.`,
+`Peru / France — Early socialist-feminist pioneer.`,
+`Argentina — A leading figure in gender studies.`,
+`Argentina — Campaigner for safe, legal abortion.`,
+`Germany — The Origin of the Family, Private Property and the State; traced women's oppression to economic roots.`,
+`USA — Legal scholar; pioneered the legal concept of sexual harassment; radical-feminist theorist.`,
+`USA — A key figure in social-reproduction theory; Marxist-feminist scholar.`,
+`UK — Psychoanalysis and Feminism; socialist and psychoanalytic feminist theorist.`,
+`USA — Economist; theorised the "dual oppression" of capitalism and patriarchy.`,
+`USA — In a Different Voice; ethics of care and cultural feminism.`,
+`USA — Radical feminist theologian; revalued a woman-centred culture and ethics.`,
+`France — Coined the term "ecofeminism" in 1974.`,
+`India — Ecofeminist and environmental activist; Staying Alive.`,
+`USA — Ecofeminist philosopher who systematised ecofeminist theory.`,
+`France — Speculum of the Other Woman; psychoanalytic and post-structural theorist.`,
+`France — Semiotician and psychoanalytic theorist; deeply influenced feminist and literary theory.`,
+`France — Advocate of "écriture féminine"; The Laugh of the Medusa.`,
+`India / USA — Postcolonial feminist; "Under Western Eyes."`,
+`India — Postcolonial theorist; "Can the Subaltern Speak?"`,
+`USA — Poet and theorist; coined "compulsory heterosexuality."`,
+`USA — Feminist philosopher; analysed oppression and patriarchal structure.`,
+`USA — Anarchist-feminist pioneer; champion of freedom and direct action.`,
+`USA — A Cyborg Manifesto; founder of cyberfeminism.`,
+`USA — Islamic feminist scholar; Qur'an and Woman.`,
+`Egypt — Islamic feminist historian; Women and Gender in Islam.`
+];
+const T={
+ zh:{
+  langBtn:'EN',title:'女权主义者图谱',subtitle:'她们，跨越时代与大陆书写的思想与行动',
+  lede:'从历史到现代，女权主义者是一个庞大、多元且跨越全球的群体。这里按<b>地区</b>与<b>时期</b>收录了具代表性的人物——远非全部——你可以沿时间之河漫游、在世界地图上追踪、或顺着思潮的网络探索。',
+  statLabels:['位人物','大板块','女权流派','个国家 / 地区','跨越年代'],visitorsLabel:'访问人数',
+  tab_map:'时空地图',tab_river:'时间长河',tab_graph:'知识网络',tab_schools:'女权流派',tab_cards:'人物图鉴',tab_submit:'补充遗漏',
+  intro_map:'拖动下方的<b>时间刻度</b>，或点击<b>播放历程</b>，看这些女权主义者如何在近两百年间、于世界各地相继登场。每个圆点是一个人，点击可看详情。',
+  intro_river:'全体人物按<b>代表年代</b>汇成一条时间之河，色带从早期一直流向当代。点击任意一位查看详情。',
+  intro_graph:'人物按<b>思潮主题</b>（金色节点：选举权、黑人女权、交叉性、诺贝尔和平奖、作家……）连成网络。<b>拖动</b>可整理布局，<b>滚轮缩放</b>，悬停高亮关联，点击人物看详情。',
+  intro_schools:'女权主义并非单一主张，而是众多<b>流派</b>的交织与争鸣——划分标准不一、彼此交叉，且新流派仍在不断出现。以下是学术界与运动中较有影响的 17 个流派及其核心观点。<b>带下划线的代表人物</b>已收录在本站，可点击查看详情。',
+  intro_submit:'这份名单远非完整。若你知道一位<b>被遗漏的女权主义者</b>，欢迎在此推荐——提交后由管理员审核，核实后加入图谱。',
+  maphint:'滚轮缩放 · 拖动平移 · 双击放大',graphhint:'拖动 · 缩放 · 悬停高亮',
+  play:'▶ 播放历程',pause:'⏸ 暂停',
+  timeAll:n=>`当前显示：全部 ${n} 位（截至 2025 年）`,timePart:(yr,n)=>`截至 ${yr} 年，已登场 ${n} 位`,
+  searchPh:'搜索姓名、地区或关键词…',chipAll:'全部',countFmt:n=>`共 ${n} 位`,empty:'没有符合条件的人物，换个筛选试试。',
+  repsLabel:'代表人物',schoolNum:(i,n)=>`流派 ${i} / ${n}`,
+  regionLabel:'Region 地区',yearLabel:'Year 年代',schoolsLabel:'所属流派 Schools',
+  wikiBtn:'维基百科 · 了解更多 →',panelNote:'链接指向中文维基百科对应条目；若某位暂无对应词条，可用英文名 <em>{en}</em> 检索。',closeLabel:'关闭',
+  lbl_name:'姓名 <i>*</i>',lbl_region:'地区 / 国家 <i>*</i>',lbl_era:'时期 / 年代',lbl_desc:'一句话简介 <i>*</i>',lbl_link:'参考链接（选填）',lbl_reason:'推荐理由（选填）',lbl_feedback:'对网站的改进建议（选填）',lbl_email:'你的邮箱（选填，便于回复）',
+  ph_name:'如：某某 / Jane Doe',ph_region:'如：法国 / 印度',ph_era:'如：19世纪 / 1970s / 当代',ph_desc:'她的主要贡献、代表作或身份',ph_link:'维基百科、文章或访谈链接',ph_reason:'为什么她应该被收录？',ph_feedback:'使用体验、想要的功能、发现的错误……都欢迎',ph_email:'you@example.com',
+  submitBtn:'提交推荐',submitting:'提交中…',msgReq:'请填写带 * 的必填项。',msgOk:'✓ 感谢推荐！提交成功，管理员审核后会加入图谱。',msgFail:'提交失败，请稍后重试。',msgNet:'网络错误，提交未成功。（在 Claude 预览中外部提交会被拦截，请在正式部署的网站上测试此表单。）',
+  footQ:'“这份名单只是冰山一角。女权主义从来不是单一声音，而是由不同种族、阶级、性取向、地域的女性共同书写的思想与行动史。”',
+  footLine:'收录 68 位人物 · 17 女权流派 · 6 大板块 · 遍及四大洲。人物简介取自原始资料，“维基百科”链接指向中文维基百科的对应条目搜索。',
+  footSrc:'资料来源：《女权主义者名单概略》《女权主义流派》· 交互设计由以上资料生成，欢迎补充与修订。'
+ },
+ en:{
+  langBtn:'中文',title:'A Global Atlas of Feminists',subtitle:'Women who wrote ideas and action across eras and continents',
+  lede:'From history to the present, feminists are a vast, plural and global company. Here is a selection of representative figures—by <b>region</b> and <b>era</b>, far from exhaustive—to wander a river of time, trace them across a world map, or follow a network of ideas.',
+  statLabels:['figures','sections','schools','countries / regions','years spanned'],visitorsLabel:'Visitors',
+  tab_map:'Time-Map',tab_river:'River of Time',tab_graph:'Network',tab_schools:'Schools',tab_cards:'Directory',tab_submit:'Suggest',
+  intro_map:'Drag the <b>time scale</b> below, or hit <b>Play</b>, to watch these feminists emerge across the world over nearly two centuries. Each dot is a person—click for details.',
+  intro_river:'Everyone arranged by <b>representative year</b> into a river of time, its colours flowing from earliest to contemporary. Click anyone for details.',
+  intro_graph:'Figures are linked by <b>schools of thought</b> (gold nodes: suffrage, Black feminism, intersectionality, Nobel Peace Prize, writer…). <b>Drag</b> to arrange, <b>scroll</b> to zoom, hover to highlight, click a person for details.',
+  intro_schools:'Feminism is not one claim but many <b>schools</b> in dialogue and dispute—divided by differing criteria, overlapping, and still multiplying. Below are 17 influential schools and their core ideas. <b>Underlined figures</b> are in this atlas—click to view.',
+  intro_submit:`This list is far from complete. If you know a <b>feminist we've missed</b>, please suggest her here—submissions are reviewed and, once verified, added to the atlas.`,
+  maphint:'Scroll to zoom · drag to pan · double-click to zoom in',graphhint:'Drag · zoom · hover to highlight',
+  play:'▶ Play',pause:'⏸ Pause',
+  timeAll:n=>`Showing all ${n} figures (through 2025)`,timePart:(yr,n)=>`By ${yr}: ${n} figures have appeared`,
+  searchPh:'Search name, region or keyword…',chipAll:'All',countFmt:n=>`${n} figures`,empty:'No matching figures—try another filter.',
+  repsLabel:'Key figures',schoolNum:(i,n)=>`School ${i} / ${n}`,
+  regionLabel:'Region',yearLabel:'Year',schoolsLabel:'Schools',
+  wikiBtn:'Wikipedia · learn more →',panelNote:'The link opens the English Wikipedia entry; if there is no exact match, search by name <em>{en}</em>.',closeLabel:'Close',
+  lbl_name:'Name <i>*</i>',lbl_region:'Region / Country <i>*</i>',lbl_era:'Era / Period',lbl_desc:'One-line description <i>*</i>',lbl_link:'Reference link (optional)',lbl_reason:'Why include her (optional)',lbl_feedback:'Suggestions for the site (optional)',lbl_email:'Your email (optional, for reply)',
+  ph_name:'e.g. Jane Doe',ph_region:'e.g. France / India',ph_era:'e.g. 19th c. / 1970s / contemporary',ph_desc:'Her main contribution, key work or role',ph_link:'Wikipedia, article or interview link',ph_reason:'Why should she be included?',ph_feedback:'Experience, wanted features, bugs—all welcome',ph_email:'you@example.com',
+  submitBtn:'Submit',submitting:'Submitting…',msgReq:'Please fill in the required fields marked *.',msgOk:'✓ Thank you! Submitted successfully—added to the atlas after review.',msgFail:'Submission failed, please try again later.',msgNet:'Network error—submission failed. (External posts are blocked in the Claude preview; test this form on the deployed site.)',
+  footQ:'"This list is only the tip of the iceberg. Feminism has never been a single voice, but a history of thought and action written together by women of different races, classes, sexualities and regions."',
+  footLine:'Collecting 68 figures · 17 schools · 6 sections · across four continents. Descriptions are drawn from the source materials; the "Wikipedia" link points to the matching entry.',
+  footSrc:'Sources: "A Brief List of Feminists" & "Schools of Feminism" · interactive design generated from these materials; additions and corrections welcome.'
+ }
+};
+function tr(k){const v=(T[LANG]&&T[LANG][k]!==undefined)?T[LANG][k]:T.zh[k];return v;}
+function pName(p){return LANG==='en'?p.en:p.name;}
+function pSub(p){return LANG==='en'?p.name:p.en;}
+function pRegion(p){return LANG==='en'?(REGION_EN[p.region]||p.region):p.region;}
+function pDesc(p){return LANG==='en'?(DESC_EN[p.id]||p.desc):p.desc;}
+function tg(t){return LANG==='en'?(TAG_EN[t]||t):t;}
+function catName(id){return LANG==='en'?CATS_EN[id].name:CATS[id].name;}
+function catShort(id){return LANG==='en'?CATS_EN[id].short:CATS[id].short;}
+function catEra(id){return LANG==='en'?CATS_EN[id].era:CATS[id].era;}
+function schName(i){return LANG==='en'?SCHOOL_EN[i].name:SCHOOLS[i].name;}
+function schCore(i){return LANG==='en'?SCHOOL_EN[i].core:SCHOOLS[i].core;}
+const enwikiURL=n=>'https://en.wikipedia.org/w/index.php?title=Special:Search&search='+encodeURIComponent(n)+'&go=Go';
+function wikiOf(p){return LANG==='en'?(p.wikiEn||enwikiURL(p.en)):(p.wiki||wikiURL(p.name));}
 
 // name, en, region, cat, lat, lng, year, tags, desc
 const D = [
@@ -514,7 +675,7 @@ const D = [
   ['法蒂玛·梅尔尼西','Fatema Mernissi','摩洛哥',6,34.03,-5.0,1975,['学者','理论'],'摩洛哥，社会学家、女性主义学者。'],
   ['弗洛拉·特里斯坦','Flora Tristan','秘鲁 / 法国',6,-12.05,-77.04,1843,['理论','先驱'],'秘鲁 / 法国，早期社会主义女权先驱。'],
   ['多拉·巴兰科斯','Dora Barrancos','阿根廷',6,-34.6,-58.38,2010,['学者','性别研究'],'阿根廷，性别研究领军人物。'],
-  ['内丽·明耶斯基','Nelly Minyersky','阿根廷',6,-34.6,-58.38,2018,['行动者','生育权','法律'],'阿根廷，争取安全堕胎权利。'],
+  ['内丽·明耶斯基','Nelly Minyersky','阿根廷',6,-34.6,-58.38,2018,['行动者','生育权','法律'],'阿根廷，争取安全堕胎权利。',null,'https://ast.wikipedia.org/wiki/Nelly_Minyersky'],
 
   // —— 由《女权主义流派》补充的代表人物 ——
   ['恩格斯','Friedrich Engels','德国',1,51.27,7.18,1884,['马克思主义女权','理论','男性盟友'],'德国，《家庭、私有制和国家的起源》，从经济根源分析女性受压迫。'],
@@ -541,7 +702,7 @@ const D = [
 ];
 
 const PEOPLE = D.map((r,i)=>({id:i,name:r[0],en:r[1],region:r[2],cat:r[3],lat:r[4],lng:r[5],
-  year:r[6],tags:r[7],desc:r[8],wiki:r[9]}));
+  year:r[6],tags:r[7],desc:r[8],wiki:r[9],wikiEn:r[10]}));
 
 const wikiURL = n => 'https://zh.wikipedia.org/w/index.php?title=Special:Search&search='+encodeURIComponent(n)+'&go=Go';
 
@@ -568,6 +729,25 @@ const SCHOOLS=[
  {name:'伊斯兰女权主义',core:'在伊斯兰传统内部通过重新解释《古兰经》和圣训争取性别平等，反对以西方世俗化为唯一路径，也反对父权式宗教解读。',reps:['阿米娜·瓦杜德','莱拉·艾哈迈德']},
  {name:'其他相关流派',core:'还有一些边界模糊或争议较大的流派，例如：个人主义女权主义（强调个人权利、自由市场，反对国家干预）；关怀伦理女权主义（以“关怀”为核心重构道德与政治）；性别批判女权主义（关注生理性别与女性权利，对性别认同政治持批判态度）。',reps:[]}
 ];
+const SCHOOL_EN=[
+ {name:'Liberal Feminism',core:`Seeks gender equality through reform within existing political, legal and economic institutions; focuses on suffrage, education, employment, equal pay and anti-discrimination law.`},
+ {name:'Radical Feminism',core:`Sees patriarchy as the most fundamental and pervasive system of oppression, centred on male control of women's bodies, sexuality and reproduction; calls for its overthrow, addressing sexual violence, pornography and reproductive technology.`},
+ {name:'Marxist Feminism',core:`Roots women's oppression in private property and class society; unpaid domestic and reproductive labour is ignored. Liberation is tied to abolishing class and transforming the relations of production.`},
+ {name:'Socialist Feminism',core:`Capitalism and patriarchy reinforce each other in a "dual oppression"; seeks to change economic structures and gender culture together—paid and unpaid labour, the welfare state, reproductive labour.`},
+ {name:'Cultural Feminism',core:`Argues that women's distinctive values of care, relationship, peace and cooperation are devalued by patriarchal culture; revalues "the feminine" and builds a woman-centred culture and ethics.`},
+ {name:'Ecofeminism',core:`Holds that the domination of women and of nature share one dualist hierarchy (man/woman, culture/nature, reason/emotion); joins ecological and gender justice against all domination.`},
+ {name:'Psychoanalytic Feminism',core:`Uses Freud and Lacan to analyse how gender identity forms, critiques "phallocentrism" and the Oedipal structure, and explores gendered power in language, the unconscious and desire.`},
+ {name:'Existentialist Feminism',core:`Beauvoir's "one is not born, but rather becomes, a woman." Woman is constructed as the "Other"; liberation requires transcending immanence through action, work and economic independence.`},
+ {name:'Postmodern / Post-structural Feminism',core:`Deconstructs universal categories like "woman" and "gender," treating gender as an effect of discourse and performativity; rejects binaries and grand narratives, stressing difference and plurality.`},
+ {name:'Black & Women-of-Colour Feminism',core:`Critiques mainstream feminism's focus on white, middle-class women; stresses the "matrix of domination" where race, class and gender intersect, centring Black and women-of-colour experience.`},
+ {name:'Intersectional Feminism',core:`Coined by Kimberlé Crenshaw; analyses how gender, race, class, sexuality and disability intersect to produce distinct experiences of oppression, avoiding single-axis analysis.`},
+ {name:'Transnational / Postcolonial Feminism',core:`Critiques Western feminism's universalism and the "saving third-world women" discourse; attends to gendered power under colonialism, imperialism and globalisation, stressing local knowledge and agency.`},
+ {name:'Lesbian Feminism / Separatism',core:`Sees compulsory heterosexuality as a core institution of patriarchy that reproduces male dominance; embraces lesbianism as a political choice, building women's spaces and community.`},
+ {name:'Anarcha-Feminism',core:`Opposes all hierarchical domination—state, capital, patriarchy, religion—favouring decentralisation, autonomy, mutual aid and direct action for gender liberation.`},
+ {name:'Cyberfeminism',core:`Explores how information technology, digital bodies and AI challenge the gender binary and bodily boundaries; the cyborg figure is seen as a way beyond fixed gender categories.`},
+ {name:'Islamic Feminism',core:`Argues for gender equality from within the Islamic tradition by reinterpreting the Qur'an and hadith, rejecting both Western secularism as the only path and patriarchal religious readings.`},
+ {name:'Other Related Currents',core:`Blurry or contested currents, e.g. individualist feminism (individual rights, free markets, minimal state), care-ethics feminism (rebuilding morality and politics around "care"), and gender-critical feminism (focus on biological sex and women's rights, critical of gender-identity politics).`}
+];
 PEOPLE.forEach(p=>p.schoolIdx=[]);
 SCHOOLS.forEach((s,idx)=>s.reps.forEach(r=>{const p=findPerson(r);if(p&&p.schoolIdx.indexOf(idx)<0)p.schoolIdx.push(idx);}));
 function highlightSchool(idx){
@@ -577,43 +757,68 @@ function highlightSchool(idx){
 }
 
 /* ---------- stats ---------- */
-(function(){
+function renderStats(){
   const regions = new Set(PEOPLE.map(p=>p.region.split(' / ')[0]));
   const yrs = PEOPLE.map(p=>p.year);
-  const S=[[PEOPLE.length,'位人物'],[6,'大板块'],[SCHOOLS.length,'女权流派'],[regions.size,'个国家 / 地区'],[Math.min(...yrs)+'–'+Math.max(...yrs),'跨越年代']];
-  document.getElementById('stats').innerHTML = S.map(s=>`<div class="stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
-})();
+  const L=tr('statLabels');
+  const vals=[PEOPLE.length,6,SCHOOLS.length,regions.size,Math.min(...yrs)+'–'+Math.max(...yrs)];
+  document.getElementById('stats').innerHTML = vals.map((v,i)=>`<div class="stat"><b>${v}</b><span>${L[i]}</span></div>`).join('');
+}
+renderStats();
 
 /* ---------- legends ---------- */
-function legendHTML(){
-  return Object.keys(CATS).map(k=>`<span class="lg cat${k}"><i></i>${CATS[k].short}</span>`).join('');
+function renderLegends(){
+  const html=Object.keys(CATS).map(k=>`<span class="lg cat${k}"><i></i>${catShort(k)}</span>`).join('');
+  ['legend-map','legend-river','legend-graph'].forEach(id=>document.getElementById(id).innerHTML=html);
 }
-['legend-map','legend-river','legend-graph'].forEach(id=>document.getElementById(id).innerHTML=legendHTML());
+renderLegends();
+
+/* ---------- visitor counter ---------- */
+// 计数服务：abacus（免费、免注册）。想独立计数就把下面的 namespace 换成你自己的唯一名字。
+const VISIT_NS='feminists-atlas-gy', VISIT_KEY='visitors';
+let visitorCount=null;
+function renderVisitors(){
+  const el=document.getElementById('visitors'); if(!el||visitorCount==null)return;
+  el.innerHTML=`<i></i><b>${visitorCount.toLocaleString()}</b><span>${tr('visitorsLabel')}</span>`;
+  el.hidden=false;
+}
+(function(){
+  const el=document.getElementById('visitors'); if(!el||!window.fetch)return;
+  let seen=false; try{seen=localStorage.getItem('fa_visited')==='1';}catch(e){}
+  const url='https://abacus.jasoncameron.dev/'+(seen?'get':'hit')+'/'+VISIT_NS+'/'+VISIT_KEY;
+  fetch(url).then(r=>r.json()).then(j=>{
+    if(j&&typeof j.value==='number'){
+      visitorCount=j.value;
+      if(!seen){try{localStorage.setItem('fa_visited','1');}catch(e){}}
+      renderVisitors();
+    }
+  }).catch(()=>{});
+})();
 
 /* ---------- detail panel ---------- */
 const panel=document.getElementById('panel'), scrim=document.getElementById('scrim');
 let lastFocus=null;
 function openDetail(p){
   lastFocus=document.activeElement;
-  const c=CATS[p.cat];
   panel.className='panel cat'+p.cat+' open';
+  const era=catEra(p.cat);
   panel.innerHTML=`
     <div class="panel-top">
-      <button class="closeb" id="pclose" aria-label="关闭">×</button>
-      <span class="p-chip"><i></i>${c.name}${c.era?' · '+c.era:''}</span>
-      <h2 class="p-name">${p.name}</h2>
-      <div class="p-en">${p.en}</div>
+      <button class="closeb" id="pclose" aria-label="${tr('closeLabel')}">×</button>
+      <span class="p-chip"><i></i>${catName(p.cat)}${era?' · '+era:''}</span>
+      <h2 class="p-name">${pName(p)}</h2>
+      <div class="p-en">${pSub(p)}</div>
       <div class="p-facts">
-        <div class="p-fact"><span>Region 地区</span><b class="zh">${p.region}</b></div>
-        <div class="p-fact"><span>Year 年代</span><b>${p.year}</b></div>
+        <div class="p-fact"><span>${tr('regionLabel')}</span><b class="zh">${pRegion(p)}</b></div>
+        <div class="p-fact"><span>${tr('yearLabel')}</span><b>${p.year}</b></div>
       </div>
     </div>
     <div class="panel-body">
-      <p class="p-desc">${p.desc}</p>
-      <div class="p-tags">${p.tags.map(t=>`<span class="p-tag"># ${t}</span>`).join('')}</div>
-      ${p.schoolIdx&&p.schoolIdx.length?`<div class="p-schools"><span class="lbl">所属流派 Schools</span>${p.schoolIdx.map(i=>`<button class="school-chip" data-school="${i}">${SCHOOLS[i].name}</button>`).join('')}</div>`:''}
-      <a class="wiki" href="${p.wiki||wikiURL(p.name)}" target="_blank" rel="noopener noreferrer">维基百科 · 了解更多 →</a>
-      <p class="panel-note">链接指向中文维基百科对应条目；若某位暂无对应词条，可用英文名 <em>${p.en}</em> 检索。</p>
+      <p class="p-desc">${pDesc(p)}</p>
+      <div class="p-tags">${p.tags.map(t=>`<span class="p-tag"># ${tg(t)}</span>`).join('')}</div>
+      ${p.schoolIdx&&p.schoolIdx.length?`<div class="p-schools"><span class="lbl">${tr('schoolsLabel')}</span>${p.schoolIdx.map(i=>`<button class="school-chip" data-school="${i}">${schName(i)}</button>`).join('')}</div>`:''}
+      <a class="wiki" href="${wikiOf(p)}" target="_blank" rel="noopener noreferrer">${tr('wikiBtn')}</a>
+      <p class="panel-note">${tr('panelNote').replace('{en}',p.en)}</p>
     </div>`;
   scrim.classList.add('open');
   document.getElementById('pclose').addEventListener('click',closeDetail);
@@ -667,8 +872,8 @@ function renderMap(){
   });
   const pinsSel=g.append('g').selectAll('circle').data(pts).join('circle')
     .attr('class',d=>'pin cat'+d.p.cat).attr('cx',d=>d.x).attr('cy',d=>d.y).attr('r',5)
-    .on('mouseenter',(e,d)=>showTip(`${d.p.name}<b>${d.p.year}</b>`,e.clientX,e.clientY))
-    .on('mousemove',(e,d)=>showTip(`${d.p.name}<b>${d.p.year}</b>`,e.clientX,e.clientY))
+    .on('mouseenter',(e,d)=>showTip(`${pName(d.p)}<b>${d.p.year}</b>`,e.clientX,e.clientY))
+    .on('mousemove',(e,d)=>showTip(`${pName(d.p)}<b>${d.p.year}</b>`,e.clientX,e.clientY))
     .on('mouseleave',hideTip)
     .on('click',(e,d)=>{hideTip();openDetail(d.p);});
   updatePins();
@@ -679,16 +884,16 @@ function updatePins(){
   const yr=+scrub.value; yearbig.textContent=yr;
   let n=0;
   d3.selectAll('#map .pin').classed('on',d=>{const on=d.p.year<=yr; if(on)n++; return on;});
-  timehint.textContent = yr>=2025 ? `当前显示：全部 ${PEOPLE.length} 位（截至 2025 年）` : `截至 ${yr} 年，已登场 ${n} 位`;
+  timehint.textContent = yr>=2025 ? tr('timeAll')(PEOPLE.length) : tr('timePart')(yr,n);
 }
 scrub.addEventListener('input',()=>{stopPlay();updatePins();});
 let playing=false,raf=null;
 const playBtn=document.getElementById('play');
-function stopPlay(){playing=false;if(raf)cancelAnimationFrame(raf);playBtn.textContent='▶ 播放历程';}
+function stopPlay(){playing=false;if(raf)cancelAnimationFrame(raf);playBtn.textContent=tr('play');}
 playBtn.addEventListener('click',()=>{
   if(playing){stopPlay();return;}
   if(RM){scrub.value=2025;updatePins();return;}
-  playing=true;playBtn.textContent='⏸ 暂停';
+  playing=true;playBtn.textContent=tr('pause');
   const startYr = (+scrub.value>=2025)?1785:+scrub.value;
   const yearsPerSec=16;          // 约 15 秒走完 1785→2025
   let t0=null;
@@ -735,7 +940,7 @@ function layoutRiver(){
   document.getElementById('rdots').innerHTML=
     pts.map(p=>`<circle class="rdot cat${p.cat}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6"/>`).join('');
 }
-(function(){
+function renderRiver(){
   const box=document.getElementById('river');
   const sorted=[...PEOPLE].sort((a,b)=>a.year-b.year||a.cat-b.cat);
   const grad=`<svg class="riverline" id="riverline" xmlns="http://www.w3.org/2000/svg">
@@ -748,31 +953,39 @@ function layoutRiver(){
     <div class="tl cat${p.cat}" data-id="${p.id}" data-cat="${p.cat}" tabindex="0" role="button">
       <div class="yr">${p.year}</div>
       <div class="card">
-        <div class="nm">${p.name}<em>${p.en}</em></div>
-        <div class="meta">${p.region} · ${CATS[p.cat].short}</div>
-        <div class="ds">${p.desc}</div>
+        <div class="nm">${pName(p)}<em>${pSub(p)}</em></div>
+        <div class="meta">${pRegion(p)} · ${catShort(p.cat)}</div>
+        <div class="ds">${pDesc(p)}</div>
       </div>
     </div>`).join('');
+}
+(function(){
+  const box=document.getElementById('river');
   box.addEventListener('click',e=>{const el=e.target.closest('.tl');if(el)openDetail(PEOPLE[+el.dataset.id]);});
   box.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('tl')){e.preventDefault();openDetail(PEOPLE[+e.target.dataset.id]);}});
 })();
+renderRiver();
 if(document.fonts&&document.fonts.ready){document.fonts.ready.then(()=>layoutRiver());}
 
 /* ---------- SCHOOLS render ---------- */
-(function(){
+function renderSchools(){
   const box=document.getElementById('schoolgrid'); if(!box)return;
   box.innerHTML=SCHOOLS.map((s,idx)=>`
     <div class="school" id="school-${idx}">
-      <div class="s-num">流派 ${idx+1} / ${SCHOOLS.length}</div>
-      <h3 class="s-name">${s.name}</h3>
-      <p class="s-core">${s.core}</p>
-      ${s.reps.length?`<div class="s-reps"><span class="s-reps-label">代表人物</span>${
+      <div class="s-num">${tr('schoolNum')(idx+1,SCHOOLS.length)}</div>
+      <h3 class="s-name">${schName(idx)}</h3>
+      <p class="s-core">${schCore(idx)}</p>
+      ${s.reps.length?`<div class="s-reps"><span class="s-reps-label">${tr('repsLabel')}</span>${
         s.reps.map(r=>{const p=findPerson(r);return p
-          ?`<button class="rep linked" data-goperson="${p.id}">${p.name}</button>`
+          ?`<button class="rep linked" data-goperson="${p.id}">${pName(p)}</button>`
           :`<span class="rep">${r}</span>`;}).join('')}</div>`:''}
     </div>`).join('');
+}
+(function(){
+  const box=document.getElementById('schoolgrid'); if(!box)return;
   box.addEventListener('click',e=>{const b=e.target.closest('[data-goperson]');if(b)openDetail(PEOPLE[+b.dataset.goperson]);});
 })();
+renderSchools();
 
 /* ---------- GRAPH ---------- */
 let graphDone=false;
@@ -801,15 +1014,15 @@ function renderGraph(){
       .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
       .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}));
   node.append('circle').attr('r',d=>d.r);
-  node.filter(d=>d.type==='hub').append('text').text(d=>d.label).attr('x',0).attr('y',d=>-d.r-5).attr('text-anchor','middle');
+  node.filter(d=>d.type==='hub').append('text').text(d=>tg(d.label)).attr('x',0).attr('y',d=>-d.r-5).attr('text-anchor','middle');
   node.on('mouseenter',(e,d)=>{
       const near=nb[d.id]; near.add(d.id);
       node.classed('dim',n=>!near.has(n.id));
       link.classed('dim',l=>l.source.id!==d.id&&l.target.id!==d.id);
       if(d.type==='person'){const b=svg.node().getBoundingClientRect();
-        showTip(`${d.ref.name}<b>${d.ref.year}</b>`, e.clientX, e.clientY);}
+        showTip(`${pName(d.ref)}<b>${d.ref.year}</b>`, e.clientX, e.clientY);}
     })
-    .on('mousemove',(e,d)=>{if(d.type==='person')showTip(`${d.ref.name}<b>${d.ref.year}</b>`,e.clientX,e.clientY);})
+    .on('mousemove',(e,d)=>{if(d.type==='person')showTip(`${pName(d.ref)}<b>${d.ref.year}</b>`,e.clientX,e.clientY);})
     .on('mouseleave',()=>{node.classed('dim',false);link.classed('dim',false);hideTip();})
     .on('click',(e,d)=>{if(d.type==='person'){hideTip();openDetail(d.ref);}});
 
@@ -832,35 +1045,34 @@ function renderGraph(){
 }
 
 /* ---------- CARDS ---------- */
-(function(){
+let cardsActiveCat=0, cardsQ='';
+function renderCards(){
   const chipsBox=document.getElementById('chips'), grid=document.getElementById('grid'),
     countEl=document.getElementById('count'), searchEl=document.getElementById('search'), emptyEl=document.getElementById('empty');
-  let activeCat=0, q='';
-  const chips=[{k:0,label:'全部'}].concat(Object.keys(CATS).map(k=>({k:+k,label:CATS[k].short})));
-  chipsBox.innerHTML=chips.map(c=>`<button class="chip${c.k?' cat'+c.k:''}" data-k="${c.k}" aria-pressed="${c.k===0}">${c.k?'<i></i>':''}${c.label}</button>`).join('');
-  chipsBox.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
-    activeCat=+b.dataset.k;
-    [...chipsBox.children].forEach(c=>c.setAttribute('aria-pressed', +c.dataset.k===activeCat));
-    render();});
-  searchEl.addEventListener('input',()=>{q=searchEl.value.trim().toLowerCase();render();});
-  function render(){
-    const list=PEOPLE.filter(p=>(activeCat===0||p.cat===activeCat) &&
-      (!q||(p.name+p.en+p.region+p.desc+p.tags.join('')).toLowerCase().includes(q)));
-    grid.innerHTML=list.map(p=>`
-      <article class="pc cat${p.cat}" data-id="${p.id}" tabindex="0" role="button">
-        <span class="tag">${CATS[p.cat].short}</span>
-        <div class="nm">${p.name}</div>
-        <div class="en">${p.en}</div>
-        <div class="rg">${p.region} · <b>${p.year}</b></div>
-        <div class="ds">${p.desc}</div>
-      </article>`).join('');
-    countEl.textContent=`共 ${list.length} 位`;
-    emptyEl.hidden=list.length>0;
-  }
+  const chips=[{k:0,label:tr('chipAll')}].concat(Object.keys(CATS).map(k=>({k:+k,label:catShort(k)})));
+  chipsBox.innerHTML=chips.map(c=>`<button class="chip${c.k?' cat'+c.k:''}" data-k="${c.k}" aria-pressed="${c.k===cardsActiveCat}">${c.k?'<i></i>':''}${c.label}</button>`).join('');
+  searchEl.placeholder=tr('searchPh');
+  const list=PEOPLE.filter(p=>(cardsActiveCat===0||p.cat===cardsActiveCat) &&
+    (!cardsQ||(p.name+p.en+p.region+(REGION_EN[p.region]||'')+p.desc+(DESC_EN[p.id]||'')+p.tags.join('')+p.tags.map(x=>TAG_EN[x]||'').join('')).toLowerCase().includes(cardsQ)));
+  grid.innerHTML=list.map(p=>`
+    <article class="pc cat${p.cat}" data-id="${p.id}" tabindex="0" role="button">
+      <span class="tag">${catShort(p.cat)}</span>
+      <div class="nm">${pName(p)}</div>
+      <div class="en">${pSub(p)}</div>
+      <div class="rg">${pRegion(p)} · <b>${p.year}</b></div>
+      <div class="ds">${pDesc(p)}</div>
+    </article>`).join('');
+  countEl.textContent=tr('countFmt')(list.length);
+  emptyEl.hidden=list.length>0;
+}
+(function(){
+  const chipsBox=document.getElementById('chips'), grid=document.getElementById('grid'), searchEl=document.getElementById('search');
+  chipsBox.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;cardsActiveCat=+b.dataset.k;renderCards();});
+  searchEl.addEventListener('input',()=>{cardsQ=searchEl.value.trim().toLowerCase();renderCards();});
   grid.addEventListener('click',e=>{const el=e.target.closest('.pc');if(el)openDetail(PEOPLE[+el.dataset.id]);});
   grid.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('pc')){e.preventDefault();openDetail(PEOPLE[+e.target.dataset.id]);}});
-  render();
 })();
+renderCards();
 
 /* ---------- SUBMIT form (Formspree) ---------- */
 (function(){
@@ -875,19 +1087,16 @@ function renderGraph(){
   form.addEventListener('submit',async e=>{
     e.preventDefault();
     msg.className='formnote';msg.textContent='';
-    if(!form.checkValidity()){msg.className='formnote err';msg.textContent='请填写带 * 的必填项。';form.reportValidity();return;}
-    if(notWired){msg.className='formnote err';
-      msg.textContent='表单尚未接入：管理员需先在代码中填入 Formspree 表单编号。';return;}
-    btn.disabled=true;btn.textContent='提交中…';
+    if(!form.checkValidity()){msg.className='formnote err';msg.textContent=tr('msgReq');form.reportValidity();return;}
+    if(notWired){msg.className='formnote err';msg.textContent=tr('msgReq');return;}
+    btn.disabled=true;btn.textContent=tr('submitting');
     try{
       const res=await fetch(FORMSPREE_ENDPOINT,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
-      if(res.ok){form.reset();msg.className='formnote ok';
-        msg.textContent='✓ 感谢推荐！提交成功，管理员审核后会加入图谱。';}
+      if(res.ok){form.reset();msg.className='formnote ok';msg.textContent=tr('msgOk');}
       else{const d=await res.json().catch(()=>({}));msg.className='formnote err';
-        msg.textContent=(d.errors&&d.errors[0]&&d.errors[0].message)||'提交失败，请稍后重试。';}
-    }catch(err){msg.className='formnote err';
-      msg.textContent='网络错误，提交未成功。（在 Claude 预览中外部提交会被拦截，请在正式部署的网站上测试此表单。）';}
-    finally{btn.disabled=false;btn.textContent='提交推荐';}
+        msg.textContent=(d.errors&&d.errors[0]&&d.errors[0].message)||tr('msgFail');}
+    }catch(err){msg.className='formnote err';msg.textContent=tr('msgNet');}
+    finally{btn.disabled=false;btn.textContent=tr('submitBtn');}
   });
 })();
 
@@ -901,6 +1110,41 @@ function show(view){
   if(view==='river')requestAnimationFrame(layoutRiver);
 }
 tabs.addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)show(b.dataset.view);});
+
+/* ---------- language ---------- */
+function applyStatic(){
+  document.documentElement.lang=LANG;
+  const set=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+  const setT=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+  setT('ttl',tr('title')); setT('sub',tr('subtitle')); set('lede',tr('lede'));
+  setT('langtoggle',tr('langBtn'));
+  [...tabs.children].forEach((t,i)=>{const v=t.dataset.view;const num=String(i+1).padStart(2,'0');
+    t.innerHTML=`<span class="k">${num}</span>${tr('tab_'+v)}`;});
+  set('intro-map',tr('intro_map')); set('intro-river',tr('intro_river')); set('intro-graph',tr('intro_graph'));
+  set('intro-schools',tr('intro_schools')); set('intro-submit',tr('intro_submit'));
+  setT('maphint',tr('maphint')); setT('graphhint',tr('graphhint'));
+  if(!playing) playBtn.textContent=tr('play');
+  set('lbl-name',tr('lbl_name')); set('lbl-region',tr('lbl_region')); set('lbl-era',tr('lbl_era'));
+  set('lbl-desc',tr('lbl_desc')); set('lbl-link',tr('lbl_link')); set('lbl-reason',tr('lbl_reason'));
+  set('lbl-feedback',tr('lbl_feedback')); set('lbl-email',tr('lbl_email'));
+  const setP=(id,txt)=>{const el=document.getElementById(id);if(el)el.placeholder=txt;};
+  setP('f-name',tr('ph_name')); setP('f-region',tr('ph_region')); setP('f-era',tr('ph_era'));
+  setP('f-desc',tr('ph_desc')); setP('f-link',tr('ph_link')); setP('f-reason',tr('ph_reason'));
+  setP('f-feedback',tr('ph_feedback')); setP('f-email',tr('ph_email'));
+  const sb=document.getElementById('subBtn'); if(sb&&!sb.disabled) sb.textContent=tr('submitBtn');
+  setT('foot-q',tr('footQ')); setT('foot-line',tr('footLine')); setT('foot-src',tr('footSrc'));
+  renderVisitors();
+}
+function setLang(l){
+  if(l===LANG)return; LANG=l;
+  if(panel.classList.contains('open'))closeDetail();
+  applyStatic(); renderStats(); renderLegends(); renderSchools(); renderCards(); renderRiver();
+  requestAnimationFrame(layoutRiver);
+  if(mapDone)updatePins();
+  if(graphDone)renderGraph();
+}
+document.getElementById('langtoggle').addEventListener('click',()=>setLang(LANG==='en'?'zh':'en'));
+applyStatic();
 show('map');
 
 /* ---------- resize ---------- */
